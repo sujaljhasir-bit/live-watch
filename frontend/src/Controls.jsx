@@ -5,8 +5,9 @@ import { formatTime } from "./format";
 // change the video at once, everyone else sends a request (Room.jsx decides which).
 export default function Controls({ hasVideo, playing, progress, mayControl, onPlayPause, onSeek }) {
   const [scrub, setScrub] = useState(null); // a number while the slider is being dragged
-  const duration = progress.duration > 0 ? progress.duration : 0;
-  const shown = scrub ?? Math.min(progress.time, duration || progress.time);
+  const duration = Number.isFinite(progress.duration) && progress.duration > 0 ? progress.duration : 0;
+  const position = Number.isFinite(progress.time) ? progress.time : 0;
+  const shown = scrub ?? Math.min(position, duration || position);
 
   function commit() {
     if (scrub !== null) {

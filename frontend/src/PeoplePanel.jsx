@@ -1,7 +1,7 @@
-import { ROLE, isHost, isModerator, nameOf } from "./roles";
+import { ROLE, isHost, isModerator, nameOf, roleOf } from "./roles";
 
 // The list of people with their roles. The host also gets buttons to manage them.
-export default function PeoplePanel({ people, meId, meRole, send }) {
+export default function PeoplePanel({ people, hostId, meId, meRole, send }) {
   const iAmHost = isHost(meRole);
 
   function makeHost(p) {
@@ -22,6 +22,7 @@ export default function PeoplePanel({ people, meId, meRole, send }) {
       <ul>
         {people.map((p) => {
           const isMe = p.id === meId;
+          const role = roleOf(p, hostId);
           return (
             <li key={p.id} className="person">
               <div className="person-main">
@@ -29,12 +30,12 @@ export default function PeoplePanel({ people, meId, meRole, send }) {
                   {nameOf(p)}
                   {isMe ? " (you)" : ""}
                 </span>
-                <span className={`badge badge-${String(p.role).toLowerCase()}`}>{p.role}</span>
+                <span className={`badge badge-${role.toLowerCase()}`}>{role}</span>
               </div>
 
               {iAmHost && !isMe && (
                 <div className="person-actions">
-                  {isModerator(p.role) ? (
+                  {isModerator(role) ? (
                     <button onClick={() => send({ type: "assign_role", targetId: p.id, role: ROLE.PARTICIPANT })}>
                       Make participant
                     </button>

@@ -59,18 +59,32 @@ public class RoomService {
     }
 
     private RoomResponse toResponse(room myRoom) {
-        List<Participantdto> participants = myRoom.getParticipants().stream()
-                .map(this::toParticipantDto)
-                .toList();
+
+        /*
+         * Take both values as close together as possible.
+         *
+         * currentTime represents the video position at approximately
+         * serverTime.
+         */
+        long serverTime = System.currentTimeMillis();
+        double currentTime = myRoom.getCurrentTime();
+
+        List<Participantdto> participants =
+                myRoom.getParticipants()
+                        .stream()
+                        .map(this::toParticipantDto)
+                        .toList();
+
         return new RoomResponse(
                 myRoom.getCode(),
                 myRoom.getHostId(),
                 myRoom.getVideoId(),
                 myRoom.isPlaying(),
-                myRoom.getCurrentTime(),
-                participants);
+                currentTime,
+                serverTime,
+                participants
+        );
     }
-
     // Look the person up FIRST, then check the role. The other order would call
     // getRole() on null for someone who is not in the room.
     private partipant getParticipantOrThrow(room myRoom, String participantId) {

@@ -1,16 +1,18 @@
 package com.cfs.livewatch.dto;
 
 import com.cfs.livewatch.model.role;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.management.relation.Role;
 @Data
 @NoArgsConstructor
-    @AllArgsConstructor
+@AllArgsConstructor
 public class Participantdto {
     private String id;
     private String username;
-    private role Role;
+
+    @JsonProperty("role")   // always send it as "role"
+    private role role;
 }

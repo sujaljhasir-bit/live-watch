@@ -82,7 +82,7 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; col
 
 .stage { position: relative; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius); overflow: hidden; }
 .stage-player, .stage-player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-.stage-shield { position: absolute; inset: 0; }
+.stage-shield { position: absolute; inset: 0; z-index: 1; }
 .stage-message {
   position: absolute; inset: 0; background: #000; display: flex; align-items: center; justify-content: center;
   font-size: clamp(1.4rem, 4vw, 3rem); font-weight: 200; color: #555; text-align: center; padding: 20px;
@@ -162,3 +162,19 @@ label { display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; col
 .request-actions { display: flex; align-items: center; gap: 8px; }
 .request-actions button { padding: 5px 10px; font-size: 0.8rem; }
 .waiting { color: var(--muted); font-size: 0.8rem; margin-right: auto; }
+
+/* ---------- help when the browser blocks autoplay ---------- */
+.stage-sound {
+  position: absolute; left: 12px; bottom: 12px; z-index: 2;
+  padding: 8px 12px; font-size: 0.85rem; background: rgba(0, 0, 0, 0.75);
+}
+.stage-hint {
+  position: absolute; left: 50%; top: 12px; transform: translateX(-50%); z-index: 2;
+  max-width: 90%; text-align: center; font-size: 0.9rem; color: #fff;
+  background: rgba(0, 0, 0, 0.8); padding: 8px 14px; border-radius: 8px; pointer-events: none;
+}
+.stage-debug {
+  position: absolute; right: 8px; bottom: 8px; z-index: 3; pointer-events: none;
+  font: 12px ui-monospace, Consolas, monospace; color: #9f9;
+  background: rgba(0, 0, 0, 0.7); padding: 4px 8px; border-radius: 6px;
+}

@@ -1,24 +1,35 @@
-// The rule for keeping a player in step with the server. It only DECIDES what to do;
-// VideoPlayer.jsx does it. Keeping the decision separate makes it easy to test.
-//
-//   desired = what the server says:   { videoId, playing, time }
-//   actual  = what our player is doing: { loadedVideoId, state, time, duration }
-export const YT_STATE = { UNSTARTED: -1, ENDED: 0, PLAYING: 1, PAUSED: 2, BUFFERING: 3, CUED: 5 };
+export const YT_STATE = {
+  UNSTARTED: -1,
+  ENDED: 0,
+  PLAYING: 1,
+  PAUSED: 2,
+  BUFFERING: 3,
+  CUED: 5,
+};
 
-const MAX_DRIFT_WHILE_PLAYING = 1.0; // seconds we tolerate before jumping
-const MAX_DRIFT_WHILE_PAUSED = 0.5;
+const MAX_DRIFT_WHILE_PLAYING = 0.35;
+const MAX_DRIFT_WHILE_PAUSED = 0.20;
 
 export function planSync(desired, actual) {
   if (!desired.videoId) return [];
 
-  // wrong video (or none yet): load it, starting at the right time
+  // Wrong video or no video loaded yet
   if (actual.loadedVideoId !== desired.videoId) {
-    return [{ do: desired.playing ? "load" : "cue", videoId: desired.videoId, time: desired.time }];
+    return [
+      {
+        do: desired.playing ? "load" : "cue",
+        videoId: desired.videoId,
+        time: desired.time,
+      },
+    ];
   }
 
-  // a video that has finished stays finished, unless the room jumped back into it
+  // If video has ended, do nothing unless server moved back into the video
   if (actual.state === YT_STATE.ENDED) {
-    const jumpedBackInside = actual.duration > 0 && desired.time < actual.duration - 1;
+    const jumpedBackInside =
+      actual.duration > 0 &&
+      desired.time < actual.duration - 1;
+
     if (!jumpedBackInside) return [];
   }
 
@@ -26,15 +37,40 @@ export function planSync(desired, actual) {
   const commands = [];
 
   if (desired.playing) {
-    if (drift > MAX_DRIFT_WHILE_PLAYING) commands.push({ do: "seek", time: desired.time });
-    if (actual.state !== YT_STATE.PLAYING && actual.state !== YT_STATE.BUFFERING) {
-      commands.push({ do: "play" });
+    // Correct accumulated drift
+    if (drift > MAX_DRIFT_WHILE_PLAYING) {
+      commands.push({
+        do: "seek",
+        time: desired.time,
+      });
+    }
+
+    // Start playback if it is not currently playing
+    if (
+      actual.state !== YT_STATE.PLAYING &&
+      actual.state !== YT_STATE.BUFFERING
+    ) {
+      commands.push({
+        do: "play",
+      });
     }
   } else {
-    if (actual.state === YT_STATE.PLAYING || actual.state === YT_STATE.BUFFERING) {
-      commands.push({ do: "pause" });
+    if (
+      actual.state === YT_STATE.PLAYING ||
+      actual.state === YT_STATE.BUFFERING
+    ) {
+      commands.push({
+        do: "pause",
+      });
     }
-    if (drift > MAX_DRIFT_WHILE_PAUSED) commands.push({ do: "seek", time: desired.time });
+
+    if (drift > MAX_DRIFT_WHILE_PAUSED) {
+      commands.push({
+        do: "seek",
+        time: desired.time,
+      });
+    }
   }
+
   return commands;
 }

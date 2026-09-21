@@ -13,6 +13,11 @@ export const isHost = (role) => same(role, ROLE.HOST);
 export const isModerator = (role) => same(role, ROLE.MODERATOR);
 export const canControl = (role) => isHost(role) || isModerator(role);
 
+// A person's role as the screen should treat it. The host is also recognised by the room's
+// hostId, so whoever created the room is the host even if the role field of the participant
+// list arrives under another name or spelling.
+export const roleOf = (p, hostId) => (p.id === hostId ? ROLE.HOST : (p.role ?? ROLE.PARTICIPANT));
+
 // The display name of a participant. Check the JSON your backend sends: the field is
 // "username" or "user" depending on how you named it in Participantdto.
 export const nameOf = (p) => p.username ?? p.user ?? p.name ?? "?";
