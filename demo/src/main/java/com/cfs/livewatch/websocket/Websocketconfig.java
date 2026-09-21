@@ -11,11 +11,11 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @RequiredArgsConstructor
 public class Websocketconfig implements WebSocketConfigurer {
 
-    private final com.cfs.livewatch.websocket.WatchPartyHandler watchPartyHandler;
+    private final WatchPartyHandler watchPartyHandler;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(watchPartyHandler, "/ws")
-                .setAllowedOrigins("http://localhost:5173");
+                .setAllowedOriginPatterns("*");
     }
 }
